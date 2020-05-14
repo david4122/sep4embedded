@@ -23,9 +23,13 @@
  // Needed for LoRaWAN
 #include <lora_driver.h>
 
+#include "AppController/AppController.h"
+
 // define two Tasks
 void task1( void *pvParameters );
 void task2( void *pvParameters );
+void task3( void *pvParameters );
+void task4( void *pvParameters );
 
 // define semaphore handle
 SemaphoreHandle_t xTestSemaphore;
@@ -49,7 +53,7 @@ void create_tasks_and_semaphores(void)
 	}
 
 	xTaskCreate(
-	task1
+	task3
 	,  (const portCHAR *)"Task1"  // A name just for humans
 	,  configMINIMAL_STACK_SIZE  // This stack size can be checked & adjusted by reading the Stack Highwater
 	,  NULL
@@ -57,7 +61,7 @@ void create_tasks_and_semaphores(void)
 	,  NULL );
 
 	xTaskCreate(
-	task2
+	task4
 	,  (const portCHAR *)"Task2"  // A name just for humans
 	,  configMINIMAL_STACK_SIZE  // This stack size can be checked & adjusted by reading the Stack Highwater
 	,  NULL
@@ -111,6 +115,28 @@ void task2( void *pvParameters )
 }
 
 /*-----------------------------------------------------------*/
+void task3( void *pvParameters )
+{
+	for(;;)
+	{
+		vTaskDelay(200);
+		printf("Task1 kurwa chuj cycki <<<%d>>> hehehe asbfiashfas\n", 4); // stdio functions are not reentrant - Should normally be protected by MUTEX
+		PORTA ^= _BV(PA0);
+	}
+}
+
+/*-----------------------------------------------------------*/
+void task4( void *pvParameters )
+{	
+	for(;;)
+	{
+		vTaskDelay(300);
+		printf("Task2 heheh bhasifnia <<<<%d>>>> oadbgadigb adfpjasfj\n", 10); // stdio functions are not reentrant - Should normally be protected by MUTEX
+		PORTA ^= _BV(PA7);
+	}
+}
+
+/*-----------------------------------------------------------*/
 void initialiseSystem()
 {
 	// Set output ports for leds used in the example
@@ -126,18 +152,17 @@ void initialiseSystem()
 	// Initialise the HAL layer and use 5 for LED driver priority
 	hal_create(5);
 	// Initialise the LoRaWAN driver without down-link buffer
-	lora_driver_create(LORA_USART, NULL);
+	//lora_driver_create(LORA_USART, NULL);
 	// Create LoRaWAN task and start it up with priority 3
-	lora_handler_create(3);
+	//lora_handler_create(3);
 }
 
 /*-----------------------------------------------------------*/
 int main(void)
 {
 	initialiseSystem(); // Must be done as the very first thing!!
-	printf("Program Started!!\n");
-	vTaskStartScheduler(); // Initialise and run the freeRTOS scheduler. Execution should never return from here.
-
+	//start_simulation();
+	vTaskStartScheduler();
 	/* Replace with your application code */
 	while (1)
 	{
