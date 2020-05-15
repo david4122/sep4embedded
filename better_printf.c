@@ -8,7 +8,8 @@
 #include<stdarg.h>
 #include<stdint.h>
 
-#include "CustomConfig.h"
+#include <ATMEGA_FreeRTOS.h>
+#include "semphr.h"
 #include "better_print.h"
 
 SemaphoreHandle_t printSemaphore;

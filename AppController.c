@@ -1,5 +1,3 @@
-#pragma once
-
 #include "AppController.h"
 
 const int Sensor1_Delay = 700;
@@ -71,7 +69,6 @@ void initialize(void) {
 }
 
 void simulationOfSensor1(void* pvParameters) {
-	pvParameters;
 	for(;;) {
 			vTaskDelay(Sensor1_Delay);
 			sensor1_measure(sensor1);
@@ -80,7 +77,6 @@ void simulationOfSensor1(void* pvParameters) {
 }
 
 void simulationOfSensor2(void* pvParameters) {
-	pvParameters;
 	for (;;) {
 			vTaskDelay(Sensor2_Delay);
 			sensor2_measure(sensor2);
@@ -89,7 +85,6 @@ void simulationOfSensor2(void* pvParameters) {
 }
 
 void loraTask(void* pvParameters) {
-	pvParameters;
 	for (;;) {
 		uint32_t loraBitResponse = xEventGroupWaitBits(eventGroupHandler, Lora_bit, pdTRUE, pdTRUE, Event_group_delay);
 		if (loraBitResponse == Lora_bit) {
@@ -102,7 +97,6 @@ void loraTask(void* pvParameters) {
 }
 
 void controlTask(void* pvParameters) {
-	pvParameters;
 	for(;;) {
 		uint32_t bitsResult = xEventGroupWaitBits(eventGroupHandler, Both_sensors_bits, pdTRUE, pdTRUE, Event_group_delay);
 		if (bitsResult == Both_sensors_bits) {
