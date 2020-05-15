@@ -1,20 +1,13 @@
+
+#include "config.h"
 #include "AppController.h"
 #include "better_print.h"
 #include "co2_sensor.h"
+#include "lora_task.h"
 
 const int Sensor1_Delay = 2000;
 const int Sensor2_Delay = 2200;
 const int Event_group_delay = 2100;
-
-#define LORA_PAYLOAD_LENGTH 2
-#define READ_DELAY 2000
-
-#define EVENT_GROUP_DELAY (2100)
-#define CO2_SENSOR_BIT (1 << 0)
-#define TEMP_HUM_BIT (1 << 1)
-#define SENSORS_BITS (CO2_SENSOR_BIT && TEMP_HUM_BIT)
-
-#define LORA_BIT (1 << 2)
 
 struct lora_bundle {
 	lora_payload_t* lora_payload;
@@ -75,8 +68,10 @@ void create_sensors_eventGroup_semaphore_and_tasks() {
 	
 	xTaskCreate(
 		controlTask, (const portCHAR*) "Control task", configMINIMAL_STACK_SIZE, (void*) lora_bundle, 0, NULL);
+		
+	lora_t* lora = lora_create(payload, eventGroupHandler, LORA_BIT);
 	xTaskCreate(
-		loraTask, (const portCHAR*) "LoraDriver simulation", configMINIMAL_STACK_SIZE, (void*) lora_bundle, 0, NULL);
+		lora_task, (const portCHAR*) "LoraDriver simulation", configMINIMAL_STACK_SIZE, (void*) lora, 0, NULL);
 
 }
 
@@ -92,18 +87,6 @@ void simulationOfSensor2(void* pvParameters) {
 	for (;;) {
 		vTaskDelay(READ_DELAY);
 		xEventGroupSetBits(eventGroupHandler, TEMP_HUM_BIT);
-	}
-}
-
-void loraTask(void* pvParameters) {
-	lora_bundle_t* bundle = (lora_bundle_t*) pvParameters;
-	for (;;) {
-		uint32_t loraBitResponse = xEventGroupWaitBits(bundle->egroup, bundle->meassage_done, pdTRUE, pdTRUE, EVENT_GROUP_DELAY);
-		if (loraBitResponse == bundle->meassage_done) {
-			bprintf("LORA BUILDING STRING");
-			bprintCallback(sent_upload_messages, bundle->lora_payload);
-			bprintf("LORA FINISHED BUILDING STRING");
-		}
 	}
 }
 
