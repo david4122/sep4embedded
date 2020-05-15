@@ -41,7 +41,7 @@ void bprintf(const char* str) {
 	}
 }
 
-void bprintCallback(void(*callback_function_example)(lora_payload_simulation_t*), lora_payload_simulation_t* arg) {
+void bprintCallback(void(*callback_function_example)(lora_payload_t*), lora_payload_t* arg) {
 	if(xSemaphoreTake(printSemaphore, portMAX_DELAY)) {
 		(*callback_function_example)(arg);
 		xSemaphoreGive(printSemaphore);

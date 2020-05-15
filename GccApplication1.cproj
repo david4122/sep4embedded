@@ -231,18 +231,6 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Sensor1.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Sensor1.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Sensor2.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Sensor2.h">
-      <SubType>compile</SubType>
-    </Compile>
     <None Include="FreeRTOS\Example\main.c">
       <SubType>compile</SubType>
     </None>

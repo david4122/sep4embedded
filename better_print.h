@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "LoraDriver.h"
+#include<lora_driver.h>
 
 void bprintf_init();
 
@@ -14,4 +14,4 @@ void bprintf(const char* str);
 
 void bprintf_int(uint16_t n);
 
-void bprintCallback(void(*callback_function_example)(lora_payload_simulation_t*), lora_payload_simulation_t* arg);
+void bprintCallback(void(*callback_function_example)(lora_payload_t*), lora_payload_t* arg);
