@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include<ATMEGA_FreeRTOS.h>
+#include<task.h>
 #include "mh_z19.h"
 
 typedef struct Sensor1* sensor1_t;

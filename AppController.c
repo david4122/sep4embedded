@@ -1,8 +1,9 @@
 #include "AppController.h"
+#include "better_print.h"
 
-const int Sensor1_Delay = 700;
-const int Sensor2_Delay = 1500;
-const int Event_group_delay = 500;
+const int Sensor1_Delay = 2000;
+const int Sensor2_Delay = 2200;
+const int Event_group_delay = 2100;
 
 const uint32_t Sensor1_bit = (1 << 0);
 const uint32_t Sensor2_bit = (1 << 1);
@@ -18,15 +19,11 @@ sensor2_t sensor2;
 lora_payload_simulation_t messageLora;
 
 void create_sensors_eventGroup_semaphore_and_tasks() {
+	bprintf_init();
 	sensor1 = sensor1_create();
 	sensor2 = sensor2_create();
 	eventGroupHandler = xEventGroupCreate();
-	if (printOutsGateKeeper == NULL) {
-		printOutsGateKeeper = xSemaphoreCreateMutex();
-		if (printOutsGateKeeper != NULL) {
-			xSemaphoreGive(printOutsGateKeeper);
-		}
-	}
+	
 	xTaskCreate(
 		simulationOfSensor1
 		, (const portCHAR*)"Simulation of sensor 1"
@@ -61,25 +58,22 @@ void create_sensors_eventGroup_semaphore_and_tasks() {
 void initialize(void) {
 	srand(time(NULL));
 	create_sensors_eventGroup_semaphore_and_tasks();
-	if (xSemaphoreTake(printOutsGateKeeper, portMAX_DELAY)) {
-		printf("ESW Sensor simulation started \n");
-		xSemaphoreGive(printOutsGateKeeper);
-	}
-		vTaskStartScheduler();
+	bprintf("ESW Sensor simulation started \n");
+	vTaskStartScheduler();
 }
 
 void simulationOfSensor1(void* pvParameters) {
 	for(;;) {
-			vTaskDelay(Sensor1_Delay);
 			sensor1_measure(sensor1);
+			vTaskDelay(Sensor1_Delay);
 			xEventGroupSetBits(eventGroupHandler, Sensor1_bit);
 	}
 }
 
 void simulationOfSensor2(void* pvParameters) {
 	for (;;) {
-			vTaskDelay(Sensor2_Delay);
 			sensor2_measure(sensor2);
+			vTaskDelay(Sensor2_Delay);
 			xEventGroupSetBits(eventGroupHandler, Sensor2_bit);
 	}
 }
@@ -88,10 +82,9 @@ void loraTask(void* pvParameters) {
 	for (;;) {
 		uint32_t loraBitResponse = xEventGroupWaitBits(eventGroupHandler, Lora_bit, pdTRUE, pdTRUE, Event_group_delay);
 		if (loraBitResponse == Lora_bit) {
-			if (xSemaphoreTake(printOutsGateKeeper, portMAX_DELAY)) {
-				sent_upload_messages(&messageLora);
-				xSemaphoreGive(printOutsGateKeeper);
-			}
+			bprintf("LORA BUILDING STRING");
+			bprintCallback(sent_upload_messages, &messageLora);
+			bprintf("LORA FINISHED BUILDING STRING");
 		}
 	}
 }
@@ -100,29 +93,20 @@ void controlTask(void* pvParameters) {
 	for(;;) {
 		uint32_t bitsResult = xEventGroupWaitBits(eventGroupHandler, Both_sensors_bits, pdTRUE, pdTRUE, Event_group_delay);
 		if (bitsResult == Both_sensors_bits) {
-			uint8_t sensor1Data = sensor1_getData(sensor1);
-			uint8_t sensor2Data = sensor2_getData(sensor2);
+			uint16_t sensor1Data = sensor1_getData(sensor1);
+			uint16_t sensor2Data = sensor2_getData(sensor2);
 			messageLora = (lora_payload_simulation_t){ 2, {sensor1Data, sensor2Data} };
 			xEventGroupSetBits(eventGroupHandler, Lora_bit);
 		}
 		else {
 			if (bitsResult != Sensor1_bit) {
-				if (xSemaphoreTake(printOutsGateKeeper, portMAX_DELAY)) {
-					printf("Sensor 1 didn't measure data yet\n");
-					xSemaphoreGive(printOutsGateKeeper);
-				}
+				bprintf("Sensor 1 didn't measure data yet\n");
 			}
 			else if (bitsResult != Sensor2_bit) {
-				if (xSemaphoreTake(printOutsGateKeeper, portMAX_DELAY)) {
-					printf("Sensor 2 didn't measure data yet\n");
-					xSemaphoreGive(printOutsGateKeeper);
-				}
+				bprintf("Sensor 2 didn't measure data yet\n");
 			}
 			else {
-				if (xSemaphoreTake(printOutsGateKeeper, portMAX_DELAY)) {
-					printf("ERROR\n");
-					xSemaphoreGive(printOutsGateKeeper);
-				}
+				bprintf("Error");
 			}
 		}
 	}

@@ -23,11 +23,10 @@ void bprintf_init() {
 	}
 }
 
-void bprintf_int(const char* str, uint8_t n) {
+void bprintf_int(uint16_t n) {
 	if(xSemaphoreTake(printSemaphore, portMAX_DELAY)) {
 		vTaskDelay(100);
-		puts(str);
-		// printf("%d\n", 10);
+		printf("%d\n", n);
 		fflush(stdout); 
 		vTaskDelay(100);
 		xSemaphoreGive(printSemaphore);
@@ -38,6 +37,13 @@ void bprintf(const char* str) {
 	if(xSemaphoreTake(printSemaphore, portMAX_DELAY)) {
 		puts(str);
 		fflush(stdout); 
+		xSemaphoreGive(printSemaphore);
+	}
+}
+
+void bprintCallback(void(*callback_function_example)(lora_payload_simulation_t*), lora_payload_simulation_t* arg) {
+	if(xSemaphoreTake(printSemaphore, portMAX_DELAY)) {
+		(*callback_function_example)(arg);
 		xSemaphoreGive(printSemaphore);
 	}
 }

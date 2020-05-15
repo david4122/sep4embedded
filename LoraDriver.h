@@ -5,8 +5,8 @@
 
 
 struct LoraPayload {
-	uint8_t		len;
-	uint8_t		bytes[2];
+	uint16_t		len;
+	uint16_t		bytes[2];
 } typedef lora_payload_simulation_t;
 
 //Updates console with the package data
