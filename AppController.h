@@ -10,7 +10,14 @@
 #include "task.h"
 #include "timers.h"
 #include <semphr.h>
+#include<lora_driver.h>
 #include "event_groups.h"
+
+typedef struct lora_bundle lora_bundle_t;
+typedef struct readings_bundle bundle_t;
+
+lora_bundle_t* lora_bundle_create(lora_payload_t* payload, bundle_t* readings, EventGroupHandle_t egroup, uint32_t sbits);
+bundle_t* bundle_create(uint16_t* co2);
 
 //Initializes and runs the simulation
 void initialize(void);

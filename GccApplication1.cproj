@@ -159,6 +159,12 @@
     <Compile Include="better_printf.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="co2_sensor.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="co2_sensor.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\display_7seg.h">
       <SubType>compile</SubType>
     </Compile>
