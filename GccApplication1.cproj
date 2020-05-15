@@ -168,6 +168,12 @@
     <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="control_task.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="control_task.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\display_7seg.h">
       <SubType>compile</SubType>
     </Compile>
@@ -223,6 +229,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\twi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="globals.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="globals.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="LoraDriver.h">

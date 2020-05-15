@@ -15,8 +15,6 @@
 typedef struct lora_bundle lora_bundle_t;
 typedef struct readings_bundle bundle_t;
 
-lora_bundle_t* lora_bundle_create(lora_payload_t* payload, bundle_t* readings, EventGroupHandle_t egroup, EventBits_t read_done, EventBits_t message_done);
-bundle_t* bundle_create(uint16_t* co2);
 
 //Initializes and runs the simulation
 void initialize(void);

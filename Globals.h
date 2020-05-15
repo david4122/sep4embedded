@@ -1,0 +1,15 @@
+/*
+ * Globals.h
+ *
+ * Created: 5/15/2020 8:30:15 PM
+ *  Author: cichy
+ */ 
+#include<stdint.h>
+#include<stdlib.h>
+
+typedef struct readings_bundle bundle_t;
+
+bundle_t* bundle_create(uint16_t* co2);
+
+uint8_t co2_get_lower_bits(bundle_t* self);
+uint8_t co2_get_higher_bits(bundle_t* self);
