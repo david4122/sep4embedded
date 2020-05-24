@@ -4,6 +4,7 @@
 #include "AppController.h"
 #include "better_print.h"
 #include "co2_sensor.h"
+#include "TempHumAdapter.h"
 #include "lora_task.h"
 #include "control_task.h"
 
@@ -26,19 +27,20 @@ void create_sensors_eventGroup_semaphore_and_tasks() {
 	co2_t* co2 = co2_create(eventGroupHandler, CO2_SENSOR_BIT);
 	xTaskCreate(
 		co2_task, (const portCHAR*) "CO2 sensor", configMINIMAL_STACK_SIZE, (void*) co2, 0, NULL);
-	//xTaskCreate(
-	//	simulationOfSensor2, (const portCHAR*) "Simulation of sensor 2", configMINIMAL_STACK_SIZE, (void*) eventGroupHandler, 0, NULL);
 		
-	bundle_t* readings = bundle_create(co2_get_data_pointer(co2));
+	tempHum_t* temphum = tempHum_create(eventGroupHandler, TEMP_HUM_BIT);
+	xTaskCreate(
+		tempHum_task, (const portCHAR*) "TempHum sensor", configMINIMAL_STACK_SIZE, (void*) temphum, 0, NULL);
+		
+	bundle_t* readings = bundle_create(co2_get_data_pointer(co2), get_temp_pointer(temphum), get_temp_pointer(temphum));
 	control_t* control_bundle = control_create(
 			payload, readings, eventGroupHandler, SENSORS_BITS, LORA_BIT);
 	 xTaskCreate(
 		control_task, (const portCHAR*) "Control task", configMINIMAL_STACK_SIZE, (void*) control_bundle, 3, NULL);
-		
+
 	lora_t* lora = lora_create(payload, eventGroupHandler, LORA_BIT);
 	xTaskCreate(
 		lora_task, (const portCHAR*) "LoraDriver simulation", configMINIMAL_STACK_SIZE, (void*) lora, 0, NULL);
-
 }
 
 void initialize(void) {

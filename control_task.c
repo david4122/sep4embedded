@@ -47,6 +47,8 @@ void control_task(void* control_bundle) {
 	
 			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);
 			bundle->lora_payload->bytes[1] = co2_get_higher_bits(bundle->readings);
+			
+			bundle->lora_payload->bytes[2] = (((uint8_t) get_temperature(bundle->readings)) >> 8 | (uint8_t) get_humidity(bundle->readings));
 
 			xEventGroupSetBits(bundle->egroup, bundle->meassage_done);
 			
