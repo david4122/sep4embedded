@@ -10,7 +10,7 @@ void sent_upload_messages(lora_payload_t* lora_payload) {
 	{
 		printf("%d ", lora_payload->bytes[i]);
 	}
-	printf("] is sent by LoRa\n");
+	puts("] is sent by LoRa");
 }
 
 void lora_init_task(void* arg) {

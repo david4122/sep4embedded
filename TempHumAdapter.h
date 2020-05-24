@@ -10,6 +10,7 @@
 #include<ATMEGA_FreeRTOS.h>
 #include<event_groups.h>
 #include<semphr.h>
+#include<hih8120.h>
 
 typedef struct tempHum_sensor tempHum_t;
 

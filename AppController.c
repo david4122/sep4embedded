@@ -26,8 +26,8 @@ void create_sensors_eventGroup_semaphore_and_tasks() {
 	co2_t* co2 = co2_create(eventGroupHandler, CO2_SENSOR_BIT);
 	xTaskCreate(
 		co2_task, (const portCHAR*) "CO2 sensor", configMINIMAL_STACK_SIZE, (void*) co2, 0, NULL);
-	xTaskCreate(
-		simulationOfSensor2, (const portCHAR*) "Simulation of sensor 2", configMINIMAL_STACK_SIZE, (void*) eventGroupHandler, 0, NULL);
+	//xTaskCreate(
+	//	simulationOfSensor2, (const portCHAR*) "Simulation of sensor 2", configMINIMAL_STACK_SIZE, (void*) eventGroupHandler, 0, NULL);
 		
 	bundle_t* readings = bundle_create(co2_get_data_pointer(co2));
 	control_t* control_bundle = control_create(

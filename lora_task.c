@@ -35,11 +35,8 @@ void lora_task(void* lora_bundle) {
 	
 	for (;;) {
 		EventBits_t loraBitResponse = xEventGroupWaitBits(bundle->egroup, bundle->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
-		puts("LORA WAIT");
-		printf("LORA WAITS FOR %d\n", bundle->ready_bit);
-		printf("GETS %d\n", loraBitResponse);
-		if (loraBitResponse == bundle->ready_bit) {
-			puts("LORA INSIDE IF <<<<<<<<<<<<<<<<<<<<<<");
+		if ((loraBitResponse & bundle->ready_bit) == bundle->ready_bit) {
+			puts("lora send");
 			bprintCallback(sent_upload_messages, bundle->payload);
 		}
 	}
