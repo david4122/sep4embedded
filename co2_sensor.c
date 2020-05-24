@@ -47,6 +47,7 @@ void co2_task(void* pvParams) {
 		puts("CO2 LOOP START");
 		mh_z19_return_code_t return_code_co2_measurement = mh_z19_take_meassuring();
 		vTaskDelay(1000);
+		
 		if(return_code_co2_measurement == MHZ19_OK) {
 			puts("co2 after measurement");
 			uint16_t measurement_uint;	// TODO
@@ -54,7 +55,7 @@ void co2_task(void* pvParams) {
 			sensor->data = measurement_uint;	// !!!
 			bprintf_int(sensor->data);
 			
-			EventBits_t co2bits = xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
+			xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
 			
 			// printf("CO2 SET BITS: %d\n", co2bits);
 		} else {

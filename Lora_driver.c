@@ -1,16 +1,18 @@
 #include<ATMEGA_FreeRTOS.h>
 #include<event_groups.h>
+#include<stdbool.h>
 
 #include "LoraDriver.h"
 #include "config.h"
 
 void sent_upload_messages(lora_payload_t* lora_payload) {
-	printf("\tPackage [ ");
-	for (uint8_t i = 0; i < lora_payload->len; i++)
+	e_LoRa_return_code_t rc;
+	if ((rc = lora_driver_sent_upload_message(false, lora_payload)) == LoRa_MAC_TX_OK )
 	{
-		printf("%d ", lora_payload->bytes[i]);
+		puts("LORA message sent");
+	} else {
+		printf("LORA send message failed: %d\n", rc);
 	}
-	puts("] is sent by LoRa");
 }
 
 void lora_init_task(void* arg) {
@@ -41,6 +43,11 @@ void lora_init_task(void* arg) {
 		puts("getting hweui failed");
 	}
 	
+	printf("LORA INIT eui: ");
+	for(int i=0; i<17; i++)
+		printf("%d ", dev_eui[i]);
+	puts("");
+	
 	if (lora_driver_set_otaa_identity(LORA_APP_EUI, LORA_APP_KEY, dev_eui) != LoRA_OK)
 	{
 		puts("setting identity failed");
@@ -51,9 +58,12 @@ void lora_init_task(void* arg) {
 		puts("saving config failed");
 	}
 	
-	if (lora_driver_join(LoRa_OTAA) == LoRa_ACCEPTED)
+	e_LoRa_return_code_t ret = lora_driver_join(LoRa_OTAA);
+	if (ret == LoRa_ACCEPTED)
 	{
-		puts("managed to join the network");
+		puts("LORA INIT managed to join the network");
+	} else {
+		printf("LORA INIT failed to join network: %d\n", ret);
 	}
 	puts("INIT SUCESSFUL");
 	
