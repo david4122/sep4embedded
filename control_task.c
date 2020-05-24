@@ -4,6 +4,8 @@
  * Created: 5/15/2020 8:24:11 PM
  *  Author: cichy
  */ 
+#include<stdio.h>
+
 #include "config.h"
 #include "control_task.h"
 #include "better_print.h"
@@ -33,8 +35,12 @@ control_t* control_create(lora_payload_t* payload, bundle_t* readings, EventGrou
 void control_task(void* control_bundle) {
 	control_t* bundle = (control_t*) control_bundle;
 	
+	xEventGroupWaitBits(bundle->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+	
 	while(1) {
-		uint32_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdTRUE, pdTRUE, EVENT_GROUP_DELAY);
+		// read_done = SENSORS_BITS
+		uint32_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdFALSE, pdTRUE, EVENT_GROUP_DELAY);
+		printf("Control task waiting for %d, but gets %d\n", bundle->read_done, bitsResult);
 		if (bitsResult == bundle->read_done) {
 	
 			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);

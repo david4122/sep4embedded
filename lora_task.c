@@ -30,12 +30,17 @@ lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBit
 
 void lora_task(void* lora_bundle) {
 	lora_t* bundle = (lora_t*) lora_bundle;
+	
+	xEventGroupWaitBits(bundle->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+	
 	for (;;) {
-		EventBits_t loraBitResponse = xEventGroupWaitBits(bundle->egroup, bundle->ready_bit, pdTRUE, pdTRUE, EVENT_GROUP_DELAY);
+		EventBits_t loraBitResponse = xEventGroupWaitBits(bundle->egroup, bundle->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
+		puts("LORA WAIT");
+		printf("LORA WAITS FOR %d\n", bundle->ready_bit);
+		printf("GETS %d\n", loraBitResponse);
 		if (loraBitResponse == bundle->ready_bit) {
-			bprintf("LORA BUILDING STRING");
+			puts("LORA INSIDE IF <<<<<<<<<<<<<<<<<<<<<<");
 			bprintCallback(sent_upload_messages, bundle->payload);
-			bprintf("LORA FINISHED BUILDING STRING");
 		}
 	}
 }

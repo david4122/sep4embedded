@@ -12,3 +12,5 @@ lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBit
 
 //Simulator of Lora prints out Data Package to the console
 void lora_task(void* lora_bundle);
+
+void lora_initialize(void);

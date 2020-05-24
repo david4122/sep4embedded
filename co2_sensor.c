@@ -4,7 +4,9 @@
  * Created: 5/15/2020 6:26:56 PM
  *  Author: cichy
  */ 
+#include<stdio.h>
 #include "co2_sensor.h"
+#include "config.h"
 
 struct co2_sensor {
 	uint16_t data;
@@ -38,24 +40,22 @@ uint16_t* co2_get_data_pointer(co2_t* self) {
 void co2_task(void* pvParams) {
 	co2_t* sensor = (co2_t*) pvParams;
 	
+	xEventGroupWaitBits(sensor->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+	
 	while(1) {
-		bprintf("BEFORE MEASURE: ");
-		bprintf_int(sensor->data);
 		mh_z19_return_code_t return_code_co2_measurement = mh_z19_take_meassuring();
-		bprintf("MEASUREMENT TAKEN");
 		vTaskDelay(1000);
-		bprintf("AFTER DELAY");
 		if(return_code_co2_measurement == MHZ19_OK) {
-			bprintf("MEASUREMENT OK");
-			uint16_t measurement_uint;
+			uint16_t measurement_uint;	// TODO
 			mh_z19_get_co2_ppm(&measurement_uint);
-			bprintf_int(measurement_uint);
 			sensor->data = measurement_uint;	// !!!
 			bprintf_int(sensor->data);
+			
+			EventBits_t co2bits = xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
+			
+			printf("CO2 SET BITS: %d\n", co2bits);
 		} else {
 			bprintf("NO OK");
 		}
-		bprintf("MEASURE FINISHED");
-		xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
 	}
 }
