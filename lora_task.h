@@ -6,6 +6,9 @@
  */ 
 #include<stdlib.h>
 
+#include<ATMEGA_FreeRTOS.h>
+#include<event_groups.h>
+
 typedef struct lora_bundle lora_t;
 
 lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBits_t bits);

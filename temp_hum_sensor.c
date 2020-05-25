@@ -7,7 +7,7 @@
  */ 
 #include<stdio.h>
 #include "config.h"
-#include "TempHumAdapter.h"
+#include "temp_hum_sensor.h"
 
 struct tempHum_sensor {
 	float hum;
@@ -41,11 +41,11 @@ tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t bit) {
 }
 
 float* get_hum_pointer(tempHum_t* self) {
-	return &self->hum;
+	return &(self->hum);
 }
 
 float* get_temp_pointer(tempHum_t* self) {
-	return &self->temp;
+	return &(self->temp);
 }
 
 void tempHum_task(void *param) {
@@ -53,26 +53,25 @@ void tempHum_task(void *param) {
 	xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 	
 	while(1) {
-		puts("[*] HUMTEMP loop starts");
 		if ( HIH8120_OK != hih8120Wakeup() )
 		{
 			puts("[!] HUMTEMP failed to wakeup");
 			break;
 		}
 
-		vTaskDelay(1000);
+		vTaskDelay(500);
 
 		if(HIH8120_OK != hih8120Meassure()) {
 			puts("[!] HUMTEMP measure failed");
 			break;
 		}
 		
-		vTaskDelay(1000);
+		vTaskDelay(500);
 		
 		self->hum = hih8120GetHumidity();
 		self->temp = hih8120GetTemperature();
 		
-		printf("[*] HUMTEMP measurement done: %f, %f\n", self->hum, self->temp);
+		printf("[<] HUMTEMP measurement done: %d, %d\n", (uint8_t) (self->hum), (uint8_t) (self->temp));
 		
 		xEventGroupSetBits(self->egroup, self->ready_bit);
 	}

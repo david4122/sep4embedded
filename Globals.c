@@ -24,6 +24,10 @@ bundle_t* bundle_create(uint16_t* co2, float* temp, float* hum) {
 	return res;
 }
 
+uint16_t get_co2(bundle_t* self) {
+	return *self->co2;
+}
+
 uint8_t co2_get_lower_bits(bundle_t* self) {
 	return *self->co2 >> 8;
 }
@@ -33,9 +37,9 @@ uint8_t co2_get_higher_bits(bundle_t* self) {
 }
 
 float get_humidity(bundle_t* self) {
-	return *self->hum;
+	return *(self->hum);
 }
 
 float get_temperature(bundle_t* self) {
-	return *self->temp;
+	return *(self->temp);
 }

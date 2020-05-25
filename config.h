@@ -4,10 +4,10 @@
  * Created: 5/15/2020 8:12:25 PM
  *  Author: cichy
  */ 
-#define LORA_PAYLOAD_LENGTH 3
+#define LORA_PAYLOAD_LENGTH 4
 #define READ_DELAY 2000
 
-#define EVENT_GROUP_DELAY (2100)
+// #define EVENT_GROUP_DELAY (2100)
 
 #define LORA_READY_BIT	( 1 << 0 )
 #define CO2_SENSOR_BIT	( 1 << 1 )

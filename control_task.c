@@ -38,17 +38,17 @@ void control_task(void* control_bundle) {
 	xEventGroupWaitBits(bundle->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 	
 	while(1) {
-		// read_done = SENSORS_BITS
-		EventBits_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdFALSE, pdTRUE, EVENT_GROUP_DELAY);
-		// printf("Control task waiting for %d, but gets %d\n", (uint32_t) bundle->read_done, (uint32_t) bitsResult);
+		EventBits_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdFALSE, pdTRUE, portMAX_DELAY);
 		
 		if ((bitsResult & bundle->read_done) == bundle->read_done) {
-			puts("CONTROL inside if");
-	
+			
+			printf("[+] CO2: %d, TEMP: %d, HUM: %d\n", get_co2(bundle->readings), (int) get_temperature(bundle->readings), (int) get_humidity(bundle->readings));
+			
 			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);
 			bundle->lora_payload->bytes[1] = co2_get_higher_bits(bundle->readings);
 			
-			bundle->lora_payload->bytes[2] = (((uint8_t) get_temperature(bundle->readings)) >> 8 | (uint8_t) get_humidity(bundle->readings));
+			bundle->lora_payload->bytes[2] = (uint8_t) get_temperature(bundle->readings);
+			bundle->lora_payload->bytes[3] = (uint8_t) get_humidity(bundle->readings);
 
 			xEventGroupSetBits(bundle->egroup, bundle->meassage_done);
 			

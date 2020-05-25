@@ -5,13 +5,15 @@
  *  Author: cichy
  */ 
 #include "config.h"
-#include "AppController.h"
+#include "app_controller.h"
 #include "lora_task.h"
+#include "lora_adapter.h"
 
 #include "better_print.h"
 
 struct lora_bundle {
 	lora_payload_t* payload;
+	
 	EventGroupHandle_t egroup;
 	EventBits_t ready_bit;
 };
@@ -29,16 +31,15 @@ lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBit
 }
 
 void lora_task(void* lora_bundle) {
-	lora_t* bundle = (lora_t*) lora_bundle;
+	lora_t* self = (lora_t*) lora_bundle;
 	
-	xEventGroupWaitBits(bundle->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+	xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 	
-	for (;;) {
-		EventBits_t loraBitResponse = xEventGroupWaitBits(bundle->egroup, bundle->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
-		if ((loraBitResponse & bundle->ready_bit) == bundle->ready_bit) {
-			bprintCallback(sent_upload_messages, bundle->payload);
-			vTaskDelay(5000);
-			puts("LORA after delay");
+	while(1) {
+		EventBits_t loraBitResponse = xEventGroupWaitBits(self->egroup, self->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
+		if ((loraBitResponse & self->ready_bit) == self->ready_bit) {
+			sent_upload_messages(self->payload);
+			vTaskDelay(500);
 		}
 	}
 }

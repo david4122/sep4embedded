@@ -147,10 +147,10 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AppController.c">
+    <Compile Include="app_controller.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="AppController.h">
+    <Compile Include="app_controller.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="better_print.h">
@@ -237,10 +237,10 @@
     <Compile Include="globals.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="LoraDriver.h">
+    <Compile Include="lora_adapter.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Lora_driver.c">
+    <Compile Include="lora_adapter.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="lora_task.c">
@@ -252,10 +252,10 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="TempHumAdapter.c">
+    <Compile Include="temp_hum_sensor.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="TempHumAdapter.h">
+    <Compile Include="temp_hum_sensor.h">
       <SubType>compile</SubType>
     </Compile>
     <None Include="FreeRTOS\Example\main.c">

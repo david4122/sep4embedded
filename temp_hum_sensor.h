@@ -16,8 +16,8 @@ typedef struct tempHum_sensor tempHum_t;
 
 tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t bit);
 
-void tempHum_task(void *param);
-
 float* get_hum_pointer(tempHum_t* self);
 
 float* get_temp_pointer(tempHum_t* self);
+
+void tempHum_task(void *param);
