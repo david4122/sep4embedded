@@ -15,9 +15,9 @@
 SemaphoreHandle_t printSemaphore;
 
 void bprintf_init() {
-	if (printSemaphore == NULL) {
+	if(printSemaphore == NULL) {
 		printSemaphore = xSemaphoreCreateMutex();
-		if (printSemaphore != NULL) {
+		if(printSemaphore != NULL) {
 			xSemaphoreGive(printSemaphore);
 		}
 	}

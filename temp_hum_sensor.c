@@ -21,7 +21,7 @@ static int driver_initialized = 0;
 
 tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t bit) {
 	if(!driver_initialized) {
-		if ( HIH8120_OK != hih8120Create() ) {
+		if(HIH8120_OK != hih8120Create()) {
 			puts("[!] HIH820 could not be initialized");
 		} else {
 			driver_initialized = 1;
@@ -53,7 +53,7 @@ void tempHum_task(void *param) {
 	xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
 	
 	while(1) {
-		if ( HIH8120_OK != hih8120Wakeup() )
+		if(HIH8120_OK != hih8120Wakeup())
 		{
 			puts("[!] HUMTEMP failed to wakeup");
 			break;

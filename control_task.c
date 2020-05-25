@@ -40,9 +40,9 @@ void control_task(void* control_bundle) {
 	while(1) {
 		EventBits_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdFALSE, pdTRUE, portMAX_DELAY);
 		
-		if ((bitsResult & bundle->read_done) == bundle->read_done) {
+		if((bitsResult & bundle->read_done) == bundle->read_done) {
 			
-			printf("[+] CO2: %d, TEMP: %d, HUM: %d\n", get_co2(bundle->readings), (int) get_temperature(bundle->readings), (int) get_humidity(bundle->readings));
+			printf("[+] [CONTROL] CO2: %d, TEMP: %d, HUM: %d\n", get_co2(bundle->readings), (int) get_temperature(bundle->readings), (int) get_humidity(bundle->readings));
 			
 			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);
 			bundle->lora_payload->bytes[1] = co2_get_higher_bits(bundle->readings);
@@ -55,11 +55,11 @@ void control_task(void* control_bundle) {
 			xEventGroupClearBits(bundle->egroup, bundle->read_done);
 			
 		} else if(bitsResult & CO2_SENSOR_BIT) {
-			bprintf("SENSOR 2 didn't measure data yet\n");
-		} else if (bitsResult & TEMP_HUM_BIT) {
-			bprintf("CO2 didn't measure data yet\n");
+			bprintf("[!] [CONTROL] Sensor 2 didn't measure data yet\n");
+		} else if(bitsResult & TEMP_HUM_BIT) {
+			bprintf("[!] [CONTROL] CO2 didn't measure data yet\n");
 		} else {
-			bprintf("event group is gay");
+			bprintf("[!] [CONTROL] Sensors not ready yet\n");
 		}
 	}
 }

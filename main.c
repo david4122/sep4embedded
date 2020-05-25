@@ -18,6 +18,8 @@
 #include <FreeRTOSTraceDriver.h>
 #include <stdio_driver.h>
 
+#include<display_7seg.h>
+
 #include "app_controller.h"
 
 

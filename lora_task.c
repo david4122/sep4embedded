@@ -37,7 +37,7 @@ void lora_task(void* lora_bundle) {
 	
 	while(1) {
 		EventBits_t loraBitResponse = xEventGroupWaitBits(self->egroup, self->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
-		if ((loraBitResponse & self->ready_bit) == self->ready_bit) {
+		if((loraBitResponse & self->ready_bit) == self->ready_bit) {
 			sent_upload_messages(self->payload);
 			vTaskDelay(500);
 		}
