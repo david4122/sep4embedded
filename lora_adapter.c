@@ -7,16 +7,18 @@
 #include "lora_driver.h"
 #include "config.h"
 
-void payload_print(lora_payload_t* payload) {
+#ifdef DEBUG
+
+void sent_upload_messages(lora_payload_t* payload) {
 	printf("[>] Lora payload [%d] {", payload->len);
 		for(int i=0; i<payload->len; i++)
 		printf("%d ", payload->bytes[i]);
 	puts("}");
 }
 
-void sent_upload_messages(lora_payload_t* lora_payload) {
-	payload_print(lora_payload);
-	
+#else
+
+void sent_upload_messages(lora_payload_t* lora_payload) {	
 	e_LoRa_return_code_t rc;
 	if((rc = lora_driver_sent_upload_message(false, lora_payload)) == LoRa_MAC_TX_OK)
 	{
@@ -26,10 +28,19 @@ void sent_upload_messages(lora_payload_t* lora_payload) {
 	}
 }
 
+#endif
+
 void lora_init_task(void* arg) {
 	EventGroupHandle_t handle = (EventGroupHandle_t) arg;
 
 	while(1) {
+
+#ifdef DEBUG
+
+		puts("[*] [LORA INIT] DEBUGGING MODE");
+
+#else
+
 		lora_driver_reset_rn2483(1); // Activate reset line
 		vTaskDelay(2);
 		lora_driver_reset_rn2483(0); // Release reset line
@@ -67,14 +78,14 @@ void lora_init_task(void* arg) {
 			continue;
 		}
 	
-		e_LoRa_return_code_t ret = lora_driver_join(LoRa_OTAA);
-		if(ret == LoRa_ACCEPTED) {
-			puts("[*] [LORA INIT] managed to join the network");
-		} else {
+		e_LoRa_return_code_t ret;
+		while((ret = lora_driver_join(LoRa_OTAA)) != LoRa_ACCEPTED) {
 			printf("[!] [LORA INIT] failed to join network: %d\n", ret);
-			continue;
 		}
-	
+		puts("[*] [LORA INIT] managed to join the network");
+
+#endif
+
 		xEventGroupSetBits(handle, LORA_READY_BIT);
 	
 		vTaskDelete(NULL);
