@@ -14,6 +14,10 @@
 #include "safeprint.h"
 #endif
 
+
+#include "safeprint.h" // <<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 struct tempHum_sensor {
 	float hum;
 	float temp;
@@ -57,7 +61,11 @@ float* get_temp_pointer(tempHum_t* self) {
 
 void tempHum_task(void *param) {
 	tempHum_t *self = (tempHum_t*) param;
-	xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+	
+	puts("TEMPHUM W8");
+	EventBits_t bits;
+	while(((bits = xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY)) & LORA_READY_BIT) == 0);
+	puts("TEMPHUM RUN");
 	
 	while(1) {
 		if(HIH8120_OK != hih8120Wakeup())
@@ -65,7 +73,7 @@ void tempHum_task(void *param) {
 #ifdef VERBOSE
 			safeprintln("[!] HUMTEMP failed to wakeup");
 #endif
-			break;
+			continue;
 		}
 
 		vTaskDelay(500);
@@ -75,7 +83,7 @@ void tempHum_task(void *param) {
 #ifdef VERBOSE
 			safeprintln("[!] HUMTEMP measure failed");
 #endif
-			break;
+			continue;
 		}
 
 		vTaskDelay(500);
@@ -83,9 +91,7 @@ void tempHum_task(void *param) {
 		self->hum = hih8120GetHumidity();
 		self->temp = hih8120GetTemperature();
 
-#ifdef VERBOSE
-		safeprintln_ints("[<] HUMTEMP measurement done: ", 2, (uint8_t) (self->hum), (uint8_t) (self->temp));
-#endif
+		safeprintln_ints("[<] HUMTEMP ", 2, (uint8_t) (self->hum), (uint8_t) (self->temp));
 
 		xEventGroupSetBits(self->egroup, self->ready_bit);
 	}

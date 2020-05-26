@@ -25,8 +25,8 @@ int freeMem() {
 
 
 bool create_tasks() {
-#ifdef VERBOSE
 	int mem = freeMem();
+#ifdef VERBOSE
 	safeprintln_int("FREE MEM: ", mem);
 #endif
 
@@ -52,9 +52,8 @@ bool create_tasks() {
 		printf("ERROR");
 		return false;
 	}
+	payload->port_no = -1;
 	payload->len = LORA_PAYLOAD_LENGTH;
-	payload->port_no = 1;
-	payload->bytes[0] = 0;
 	
 	xTaskCreate(lora_init_task,
 			"LORA INIT TASK",
@@ -155,9 +154,7 @@ void initialize(void) {
 	if(create_tasks())
 		vTaskStartScheduler();
 	else
-#ifdef VERBOSE
-		safeprintln("[F] create_tasks failed");
-#endif
+		puts("[F] create_tasks failed");
 }
 
 

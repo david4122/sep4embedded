@@ -7,7 +7,7 @@
 #include "lora_driver.h"
 #include "config.h"
 
-#ifdef DEBUG
+#ifdef DEBUG_MODE
 
 void sent_upload_messages(lora_payload_t* payload) {
 	printf("[>] Lora payload [%d] {", payload->len);
@@ -79,15 +79,17 @@ void lora_init_task(void* arg) {
 		}
 	
 		e_LoRa_return_code_t ret;
-		while((ret = lora_driver_join(LoRa_OTAA)) != LoRa_ACCEPTED) {
+		if((ret = lora_driver_join(LoRa_OTAA)) != LoRa_ACCEPTED) {
 			printf("[!] [LORA INIT] failed to join network: %d\n", ret);
-			vTaskDelay(200);
+			continue;
 		}
 		puts("[*] [LORA INIT] managed to join the network");
 
 #endif
 
 		xEventGroupSetBits(handle, LORA_READY_BIT);
+		
+		puts("LORA INIT DONE");
 	
 		vTaskDelete(NULL);
 	}

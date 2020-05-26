@@ -61,16 +61,12 @@ void control_task(void* control_bundle) {
 			
 			xEventGroupClearBits(bundle->egroup, bundle->read_done);
 			
+#ifdef VERBOSE
 		} else if(bitsResult & CO2_SENSOR_BIT) {
-		#ifdef VERBOSE
 			safeprintln("[!] [CONTROL] Sensor 2 didn't measure data yet");
-#endif
 		} else if(bitsResult & TEMP_HUM_BIT) {
-#ifdef VERBOSE
 			safeprintln("[!] [CONTROL] CO2 didn't measure data yet");
-#endif
 		} else {
-#ifdef VERBOSE
 			safeprintln("[!] [CONTROL] Sensors not ready yet");
 #endif
 		}

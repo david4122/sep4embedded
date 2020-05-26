@@ -18,8 +18,6 @@
 #include <FreeRTOSTraceDriver.h>
 #include <stdio_driver.h>
 
-#include<display_7seg.h>
-
 #include "app_controller.h"
 
 
@@ -35,9 +33,6 @@ void initialiseSystem() {
 	lora_driver_create(LORA_USART, NULL);
 	// Create LoRaWAN task and start it up with priority 3
 	//lora_handler_create(3);
-	display_7seg_init(NULL);
-	display_7seg_power_up();
-	display_7seg_display(69,2);
 }
 
 int main(void) {

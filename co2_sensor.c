@@ -46,8 +46,11 @@ uint16_t* co2_get_data_pointer(co2_t* self) {
 
 void co2_task(void* pvParams) {
 	co2_t* sensor = (co2_t*) pvParams;
-	xEventGroupWaitBits(sensor->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-	printf("CO2 start");
+	
+	puts("CO2 w8");
+	EventBits_t bits;
+	while(((bits = xEventGroupWaitBits(sensor->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY)) & LORA_READY_BIT) == 0);
+	puts("CO2 start");
 
 	while(1) {
 		mh_z19_return_code_t return_code_co2_measurement = mh_z19_take_meassuring();
