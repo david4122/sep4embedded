@@ -35,7 +35,7 @@ void lora_init_task(void* arg) {
 
 	while(1) {
 
-#ifdef DEBUG
+#ifdef DEBUG_MODE
 
 		puts("[*] [LORA INIT] DEBUGGING MODE");
 
@@ -81,6 +81,7 @@ void lora_init_task(void* arg) {
 		e_LoRa_return_code_t ret;
 		while((ret = lora_driver_join(LoRa_OTAA)) != LoRa_ACCEPTED) {
 			printf("[!] [LORA INIT] failed to join network: %d\n", ret);
+			vTaskDelay(200);
 		}
 		puts("[*] [LORA INIT] managed to join the network");
 

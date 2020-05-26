@@ -8,7 +8,10 @@
 
 #include "config.h"
 #include "control_task.h"
-#include "better_print.h"
+
+#ifdef VERBOSE
+#include "safeprint.h"
+#endif
 
 struct control_bundle {
 	lora_payload_t* lora_payload;
@@ -42,7 +45,11 @@ void control_task(void* control_bundle) {
 		
 		if((bitsResult & bundle->read_done) == bundle->read_done) {
 			
+#ifdef VERBOSE
+			safeprint_acquire();
 			printf("[+] [CONTROL] CO2: %d, TEMP: %d, HUM: %d\n", get_co2(bundle->readings), (int) get_temperature(bundle->readings), (int) get_humidity(bundle->readings));
+			safeprint_release();
+#endif
 			
 			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);
 			bundle->lora_payload->bytes[1] = co2_get_higher_bits(bundle->readings);
@@ -55,11 +62,17 @@ void control_task(void* control_bundle) {
 			xEventGroupClearBits(bundle->egroup, bundle->read_done);
 			
 		} else if(bitsResult & CO2_SENSOR_BIT) {
-			bprintf("[!] [CONTROL] Sensor 2 didn't measure data yet\n");
+		#ifdef VERBOSE
+			safeprintln("[!] [CONTROL] Sensor 2 didn't measure data yet");
+#endif
 		} else if(bitsResult & TEMP_HUM_BIT) {
-			bprintf("[!] [CONTROL] CO2 didn't measure data yet\n");
+#ifdef VERBOSE
+			safeprintln("[!] [CONTROL] CO2 didn't measure data yet");
+#endif
 		} else {
-			bprintf("[!] [CONTROL] Sensors not ready yet\n");
+#ifdef VERBOSE
+			safeprintln("[!] [CONTROL] Sensors not ready yet");
+#endif
 		}
 	}
 }

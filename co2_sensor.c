@@ -4,9 +4,13 @@
  * Created: 5/15/2020 6:26:56 PM
  *  Author: cichy
  */ 
+#include<stdlib.h>
 #include<stdio.h>
 
-#include "better_print.h"
+#ifdef VERBOSE
+#include "safeprint.h"
+#endif
+
 #include "co2_sensor.h"
 #include "config.h"
 
@@ -43,7 +47,8 @@ uint16_t* co2_get_data_pointer(co2_t* self) {
 void co2_task(void* pvParams) {
 	co2_t* sensor = (co2_t*) pvParams;
 	xEventGroupWaitBits(sensor->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-	
+	printf("CO2 start");
+
 	while(1) {
 		mh_z19_return_code_t return_code_co2_measurement = mh_z19_take_meassuring();
 		vTaskDelay(500);
@@ -51,11 +56,13 @@ void co2_task(void* pvParams) {
 		if(return_code_co2_measurement == MHZ19_OK) {
 			mh_z19_get_co2_ppm(&sensor->data);
 			printf("[<] CO2: %d\n", sensor->data);
-						
+
 			xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
-			
+
 		} else {
-			bprintf("[!] CO2: measurement failed");
+#ifdef VERBOSE
+			safeprintln("[!] CO2: measurement failed");
+#endif
 		}
 	}
 }

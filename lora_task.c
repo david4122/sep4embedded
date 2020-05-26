@@ -9,7 +9,6 @@
 #include "lora_task.h"
 #include "lora_adapter.h"
 
-#include "better_print.h"
 
 struct lora_bundle {
 	lora_payload_t* payload;
