@@ -19,10 +19,10 @@
 
 #define LORA_APP_EUI "80BE5102E3968E56"
 #define LORA_APP_KEY "A9518CB9DBD95CA82F3C12F5D87AE2F6"
-//
-//#ifndef DEBUG_MODE
-//#define DEBUG_MODE
-//#endif
+
+#ifndef DEBUG_MODE
+#define DEBUG_MODE
+#endif
 
 //#define VERBOSE
 

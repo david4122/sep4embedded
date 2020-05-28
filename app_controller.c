@@ -10,9 +10,15 @@
 #include "lora_task.h"
 #include "control_task.h"
 
+
 #ifdef VERBOSE
 #include "safeprint.h"
 #endif
+
+#include "rcServo.h"
+
+void rcServoTest(void*);
+
 
 
 int freeMem() {
@@ -37,24 +43,26 @@ bool create_tasks() {
 #endif
 		return false;
 	}
-	
-#ifdef VERBOSE
-	mem = freeMem();
-	safeprintln_int("FREE MEM: ", mem);
-#endif
 
-	
+	xTaskCreate(rcServoTest,
+			"RC Servo test task",
+			configMINIMAL_STACK_SIZE,
+			NULL,
+			3,
+			NULL);
+
+
 	// TODO move
 	lora_payload_t* payload = malloc(sizeof(lora_payload_t));
 	if(!payload) {
 		mem = freeMem();
-		
+
 		printf("ERROR");
 		return false;
 	}
 	payload->port_no = -1;
 	payload->len = LORA_PAYLOAD_LENGTH;
-	
+
 	xTaskCreate(lora_init_task,
 			"LORA INIT TASK",
 			configMINIMAL_STACK_SIZE,
@@ -67,7 +75,7 @@ bool create_tasks() {
 	mem = freeMem();
 	safeprintln_int("FREE MEM: ", mem);
 #endif			
-			
+
 	co2_t* co2 = co2_create(egroup, CO2_SENSOR_BIT);
 	if(co2 == NULL) {
 #ifdef VERBOSE
@@ -82,8 +90,8 @@ bool create_tasks() {
 			(void*) co2,
 			1,
 			NULL);
-			
-		
+
+
 	tempHum_t* temphum = tempHum_create(egroup, TEMP_HUM_BIT);
 	if(!temphum) {
 #ifdef VERBOSE
@@ -91,15 +99,15 @@ bool create_tasks() {
 #endif
 		return false;
 	}
-	
+
 	xTaskCreate(tempHum_task,
 			(const portCHAR*) "TempHum sensor",
 			configMINIMAL_STACK_SIZE,
 			(void*) temphum,
 			1,
 			NULL);
-			
-		
+
+
 	bundle_t* readings = bundle_create(co2_get_data_pointer(co2), get_temp_pointer(temphum), get_hum_pointer(temphum));
 	if(!readings) {
 #ifdef VERBOSE
@@ -107,7 +115,7 @@ bool create_tasks() {
 #endif
 		return false;
 	}
-		
+
 	control_t* control = control_create(
 			payload, readings, egroup, SENSORS_BITS, LORA_BIT);
 	if(!control) {
@@ -116,14 +124,14 @@ bool create_tasks() {
 #endif
 		return false;
 	}
-	
+
 	xTaskCreate(control_task,
-			 (const portCHAR*) "Control",
-			 configMINIMAL_STACK_SIZE,
-			 (void*) control,
-			 3,
-			 NULL);
-			 
+			(const portCHAR*) "Control",
+			configMINIMAL_STACK_SIZE,
+			(void*) control,
+			3,
+			NULL);
+
 
 	lora_t* lora = lora_create(payload, egroup, LORA_BIT);
 	if(!lora) {
@@ -132,7 +140,7 @@ bool create_tasks() {
 #endif
 		return false;
 	}
-	
+
 	xTaskCreate(lora_task,
 			(const portCHAR*) "Lora",
 			configMINIMAL_STACK_SIZE,
@@ -150,7 +158,7 @@ void initialize(void) {
 	int mem = freeMem();
 	safeprintln_int("FREE MEM: ", mem);
 #endif
-	
+
 	if(create_tasks())
 		vTaskStartScheduler();
 	else
@@ -158,3 +166,22 @@ void initialize(void) {
 }
 
 
+
+void rcServoTest(void* param) {
+
+	rcServoCreate();
+	vTaskDelay(500);
+
+	while(1) {
+		puts("SERVO TEST 1");
+		rcServoSet(0, 100);
+		vTaskDelay(500);
+		puts("FOR DONE");
+		
+		puts("SERVO TEST 3");
+		rcServoSet(0, -100);
+		vTaskDelay(500);
+			
+	}
+
+}
