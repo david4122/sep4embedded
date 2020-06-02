@@ -10,6 +10,8 @@ bool safeprint_init(void);
 
 bool safeprint(const char* str);
 
+bool safeprint_int(const char* prefix, int i);
+
 bool safeprintln(const char* str);
 
 bool safeprintln_int(const char* prefix, int i);

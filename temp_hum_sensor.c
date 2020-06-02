@@ -14,8 +14,7 @@
 #include "safeprint.h"
 #endif
 
-
-#include "safeprint.h" // <<<<<<<<<<<<<<<<<<<<<<<<<
+#include "safeprint.h" 
 
 
 struct tempHum_sensor {
@@ -70,9 +69,7 @@ void tempHum_task(void *param) {
 	while(1) {
 		if(HIH8120_OK != hih8120Wakeup())
 		{
-#ifdef VERBOSE
 			safeprintln("[!] HUMTEMP failed to wakeup");
-#endif
 			continue;
 		}
 

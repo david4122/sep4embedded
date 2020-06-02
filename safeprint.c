@@ -47,6 +47,16 @@ bool safeprint(const char* str) {
 	return false;
 }
 
+bool safeprint_int(const char* prefix, int i) {
+	if(safeprint_acquire()) {
+		printf("%s%d", prefix, i);
+		
+		if(safeprint_release())
+			return true;
+	}
+	return false;
+}
+
 bool safeprintln(const char* str) {
 	if(safeprint_acquire()) {
 		puts(str);

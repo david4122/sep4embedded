@@ -14,6 +14,8 @@
 #include "co2_sensor.h"
 #include "config.h"
 
+#include "safeprint.h"
+
 struct co2_sensor {
 	uint16_t data;
 	
@@ -58,7 +60,7 @@ void co2_task(void* pvParams) {
 		
 		if(return_code_co2_measurement == MHZ19_OK) {
 			mh_z19_get_co2_ppm(&sensor->data);
-			printf("[<] CO2: %d\n", sensor->data);
+			safeprintln_int("[<] CO2: ", sensor->data);
 
 			xEventGroupSetBits(sensor->egroup, sensor->ready_bit);
 

@@ -55,9 +55,7 @@ bool create_tasks() {
 	// TODO move
 	lora_payload_t* payload = malloc(sizeof(lora_payload_t));
 	if(!payload) {
-		mem = freeMem();
-
-		printf("ERROR");
+		safeprintln("[!] Could not initialize LoRa payload");
 		return false;
 	}
 	payload->port_no = -1;
