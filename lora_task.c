@@ -12,33 +12,38 @@
 
 struct lora_bundle {
 	lora_payload_t* payload;
-	
+
 	EventGroupHandle_t egroup;
-	EventBits_t ready_bit;
+	EventBits_t wait_for;
+	EventBits_t ready;
 };
 
-lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBits_t bits) {
+lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBits_t wait_for, EventBits_t ready) {
 	lora_t* res = malloc(sizeof(lora_t));
 	if(!res)
 		return NULL;
-	
+
 	res->payload = payload;
 	res->egroup = egroup;
-	res->ready_bit = bits;
-	
+	res->wait_for = wait_for;
+	res->ready = ready;
+
 	return res;
 }
 
 void lora_task(void* lora_bundle) {
 	lora_t* self = (lora_t*) lora_bundle;
-	
-	xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-	
+
+	xEventGroupWaitBits(self->egroup, LORA_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+
 	while(1) {
-		EventBits_t loraBitResponse = xEventGroupWaitBits(self->egroup, self->ready_bit, pdTRUE, pdTRUE, portMAX_DELAY);
-		if((loraBitResponse & self->ready_bit) == self->ready_bit) {
+		EventBits_t loraBitResponse = xEventGroupWaitBits(self->egroup, self->wait_for, pdTRUE, pdTRUE, portMAX_DELAY);
+
+		if((loraBitResponse & self->wait_for) == self->wait_for) {
 			sent_upload_messages(self->payload);
-			vTaskDelay(500);
+			vTaskDelay(5000);
+
+			xEventGroupSetBits(self->egroup, self->ready);
 		}
 	}
 }

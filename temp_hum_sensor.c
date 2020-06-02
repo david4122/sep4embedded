@@ -22,12 +22,13 @@ struct tempHum_sensor {
 	float temp;
 
 	EventGroupHandle_t egroup;
-	EventBits_t ready_bit;
+	EventBits_t wait_for;
+	EventBits_t ready;
 };
 
 static int driver_initialized = 0;
 
-tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t bit) {
+tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t wait_for, EventBits_t ready) {
 	if(!driver_initialized) {
 		if(HIH8120_OK != hih8120Create()) {
 #ifdef VERBOSE
@@ -41,12 +42,14 @@ tempHum_t* tempHum_create(EventGroupHandle_t egroup, EventBits_t bit) {
 	tempHum_t *res = malloc(sizeof(tempHum_t));
 	if(!res)
 		return NULL;
-		
+
 	res->hum = -1;
 	res->temp = -1;
+
 	res->egroup = egroup;
-	res->ready_bit = bit;
-	
+	res->wait_for = wait_for;
+	res->ready = ready;
+
 	return res;
 }
 
@@ -60,13 +63,12 @@ float* get_temp_pointer(tempHum_t* self) {
 
 void tempHum_task(void *param) {
 	tempHum_t *self = (tempHum_t*) param;
-	
-	puts("TEMPHUM W8");
+
 	EventBits_t bits;
-	while(((bits = xEventGroupWaitBits(self->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY)) & LORA_READY_BIT) == 0);
-	puts("TEMPHUM RUN");
-	
 	while(1) {
+		while(((bits = xEventGroupWaitBits(self->egroup, self->wait_for, pdFALSE, pdTRUE, portMAX_DELAY)) & self->wait_for) != self->wait_for
+				|| (bits & self->ready) != 0);
+
 		if(HIH8120_OK != hih8120Wakeup())
 		{
 			safeprintln("[!] HUMTEMP failed to wakeup");
@@ -75,12 +77,12 @@ void tempHum_task(void *param) {
 
 		vTaskDelay(500);
 
-		if(HIH8120_OK != hih8120Meassure()) {
+		while(HIH8120_OK != hih8120Meassure()) {
 
 #ifdef VERBOSE
 			safeprintln("[!] HUMTEMP measure failed");
 #endif
-			continue;
+			vTaskDelay(200);
 		}
 
 		vTaskDelay(500);
@@ -90,6 +92,6 @@ void tempHum_task(void *param) {
 
 		safeprintln_ints("[<] HUMTEMP ", 2, (uint8_t) (self->hum), (uint8_t) (self->temp));
 
-		xEventGroupSetBits(self->egroup, self->ready_bit);
+		xEventGroupSetBits(self->egroup, self->ready);
 	}
 }

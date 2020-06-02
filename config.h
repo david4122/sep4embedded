@@ -15,15 +15,16 @@
 #define CO2_SENSOR_BIT	( 1 << 1 )
 #define TEMP_HUM_BIT	( 1 << 2 )
 #define SENSORS_BITS	( CO2_SENSOR_BIT | TEMP_HUM_BIT )
-#define LORA_BIT		( 1 << 3 )
+#define CONTROL_BIT		( 1 << 3 )
+#define LORA_BIT		( 1 << 4 )
 
 #define LORA_APP_EUI "80BE5102E3968E56"
 #define LORA_APP_KEY "A9518CB9DBD95CA82F3C12F5D87AE2F6"
 
-//#ifndef DEBUG_MODE
-//#define DEBUG_MODE
-//#endif
+/* #ifndef DEBUG_MODE */
+/* #define DEBUG_MODE */
+/* #endif */
 
-//#define VERBOSE
+/* #define VERBOSE */
 
 int freeMem();

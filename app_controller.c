@@ -9,13 +9,10 @@
 #include "lora_adapter.h"
 #include "lora_task.h"
 #include "control_task.h"
-
-
-#ifdef VERBOSE
-#include "safeprint.h"
-#endif
-
 #include "rcServo.h"
+
+#include "safeprint.h"
+
 
 void rcServoTest(void*);
 
@@ -31,8 +28,8 @@ int freeMem() {
 
 
 bool create_tasks() {
-	int mem = freeMem();
 #ifdef VERBOSE
+	int mem = freeMem();
 	safeprintln_int("FREE MEM: ", mem);
 #endif
 
@@ -74,7 +71,7 @@ bool create_tasks() {
 	safeprintln_int("FREE MEM: ", mem);
 #endif			
 
-	co2_t* co2 = co2_create(egroup, CO2_SENSOR_BIT);
+	co2_t* co2 = co2_create(egroup, LORA_BIT, CO2_SENSOR_BIT);
 	if(co2 == NULL) {
 #ifdef VERBOSE
 		safeprintln("[!] [CONTROLLER] Could not initialize co2 sensor");
@@ -90,7 +87,7 @@ bool create_tasks() {
 			NULL);
 
 
-	tempHum_t* temphum = tempHum_create(egroup, TEMP_HUM_BIT);
+	tempHum_t* temphum = tempHum_create(egroup, LORA_BIT, TEMP_HUM_BIT);
 	if(!temphum) {
 #ifdef VERBOSE
 		safeprintln("[!] [CONTROLLER] Could not initialize temp/hum sensor");
@@ -115,7 +112,7 @@ bool create_tasks() {
 	}
 
 	control_t* control = control_create(
-			payload, readings, egroup, SENSORS_BITS, LORA_BIT);
+			payload, readings, egroup, SENSORS_BITS, CONTROL_BIT);
 	if(!control) {
 #ifdef VERBOSE
 		safeprintln("[!] [CONTROLLER] Could not create control task");
@@ -131,7 +128,7 @@ bool create_tasks() {
 			NULL);
 
 
-	lora_t* lora = lora_create(payload, egroup, LORA_BIT);
+	lora_t* lora = lora_create(payload, egroup, CONTROL_BIT, LORA_BIT);
 	if(!lora) {
 #ifdef VERBOSE
 		safeprintln("[!] [CONTROLLER] Could not initialize lora task");
@@ -146,7 +143,7 @@ bool create_tasks() {
 			1,
 			NULL);
 
-	puts("INIT DONE");
+	safeprintln("[*] INIT DONE");
 
 	return true;
 }
@@ -160,7 +157,7 @@ void initialize(void) {
 	if(create_tasks())
 		vTaskStartScheduler();
 	else
-		puts("[F] create_tasks failed");
+		safeprintln("[F] create_tasks failed");
 }
 
 
@@ -171,15 +168,11 @@ void rcServoTest(void* param) {
 	vTaskDelay(500);
 
 	while(1) {
-		puts("SERVO TEST 1");
 		rcServoSet(0, 100);
 		vTaskDelay(500);
-		puts("FOR DONE");
 		
-		puts("SERVO TEST 3");
 		rcServoSet(0, -100);
 		vTaskDelay(500);
-			
 	}
 
 }

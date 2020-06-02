@@ -14,7 +14,7 @@
 
 typedef struct co2_sensor co2_t;
 
-co2_t *co2_create(EventGroupHandle_t egroup, EventBits_t bit);
+co2_t *co2_create(EventGroupHandle_t egroup, EventBits_t wait_for, EventBits_t ready);
 
 uint16_t* co2_get_data_pointer(co2_t* self);
 

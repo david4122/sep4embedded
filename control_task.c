@@ -16,12 +16,13 @@
 struct control_bundle {
 	lora_payload_t* lora_payload;
 	bundle_t* readings;
+
 	EventGroupHandle_t egroup;
-	EventBits_t read_done;
-	EventBits_t meassage_done;
+	EventBits_t wait_for;
+	EventBits_t ready;
 };
 
-control_t* control_create(lora_payload_t* payload, bundle_t* readings, EventGroupHandle_t egroup, EventBits_t read_done, EventBits_t message_done) {
+control_t* control_create(lora_payload_t* payload, bundle_t* readings, EventGroupHandle_t egroup, EventBits_t wait_for, EventBits_t ready) {
 	control_t* res = malloc(sizeof(control_t));
 	if(!res)
 		return NULL;
@@ -29,38 +30,43 @@ control_t* control_create(lora_payload_t* payload, bundle_t* readings, EventGrou
 	res->lora_payload = payload;
 	res->readings = readings;
 	res->egroup = egroup;
-	res->read_done = read_done;
-	res->meassage_done = message_done;
+	res->wait_for = wait_for;
+	res->ready = ready;
 
 	return res;
 }
 
 void control_task(void* control_bundle) {
-	control_t* bundle = (control_t*) control_bundle;
-	
-	xEventGroupWaitBits(bundle->egroup, LORA_READY_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-	
+	control_t* self = (control_t*) control_bundle;
+
+	xEventGroupWaitBits(self->egroup, LORA_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+
 	while(1) {
-		EventBits_t bitsResult = xEventGroupWaitBits(bundle->egroup, bundle->read_done, pdFALSE, pdTRUE, portMAX_DELAY);
-		
-		if((bitsResult & bundle->read_done) == bundle->read_done) {
-			
+		xEventGroupClearBits(self->egroup, self->ready);
+
+		EventBits_t bitsResult = xEventGroupWaitBits(self->egroup, self->wait_for, pdFALSE, pdTRUE, portMAX_DELAY);
+		xEventGroupClearBits(self->egroup, LORA_BIT);
+		xEventGroupClearBits(self->egroup, self->wait_for);
+
+		if((bitsResult & self->wait_for) == self->wait_for) {
+
 #ifdef VERBOSE
 			safeprint_acquire();
-			printf("[+] [CONTROL] CO2: %d, TEMP: %d, HUM: %d\n", get_co2(bundle->readings), (int) get_temperature(bundle->readings), (int) get_humidity(bundle->readings));
+			printf("[+] [CONTROL] CO2: %d, TEMP: %d, HUM: %d\n",
+					get_co2(self->readings),
+					(int) get_temperature(self->readings),
+					(int) get_humidity(self->readings));
 			safeprint_release();
 #endif
-			
-			bundle->lora_payload->bytes[0] = co2_get_lower_bits(bundle->readings);
-			bundle->lora_payload->bytes[1] = co2_get_higher_bits(bundle->readings);
-			
-			bundle->lora_payload->bytes[2] = (uint8_t) get_temperature(bundle->readings);
-			bundle->lora_payload->bytes[3] = (uint8_t) get_humidity(bundle->readings);
 
-			xEventGroupSetBits(bundle->egroup, bundle->meassage_done);
-			
-			xEventGroupClearBits(bundle->egroup, bundle->read_done);
-			
+			self->lora_payload->bytes[0] = co2_get_lower_bits(self->readings);
+			self->lora_payload->bytes[1] = co2_get_higher_bits(self->readings);
+
+			self->lora_payload->bytes[2] = (uint8_t) get_temperature(self->readings);
+			self->lora_payload->bytes[3] = (uint8_t) get_humidity(self->readings);
+
+			xEventGroupSetBits(self->egroup, self->ready);
+
 #ifdef VERBOSE
 		} else if(bitsResult & CO2_SENSOR_BIT) {
 			safeprintln("[!] [CONTROL] Sensor 2 didn't measure data yet");

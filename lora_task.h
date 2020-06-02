@@ -11,9 +11,8 @@
 
 typedef struct lora_bundle lora_t;
 
-lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBits_t bits);
+lora_t* lora_create(lora_payload_t* payload, EventGroupHandle_t egroup, EventBits_t wait_for, EventBits_t ready);
 
-//Simulator of Lora prints out Data Package to the console
 void lora_task(void* lora_bundle);
 
 void lora_initialize(void);
